@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Empleados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .dashboard {
+            display: none;
+        }
+        .upload-section {
+            margin: 20px 0;
+            padding: 40px 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .upload-section.drag-over {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+        }
+        .upload-section input[type="file"] {
+            display: none;
+        }
+        .upload-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .upload-button:hover {
+            background-color: #45a049;
+        }
+        .progress-container {
+            margin-top: 15px;
+            display: none;
+        }
+        .progress-container.active {
+            display: block;
+        }
+        progress {
+            width: 100%;
+            height: 20px;
+            border-radius: 10px;
+        }
+        progress::-webkit-progress-bar {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+        }
+        progress::-webkit-progress-value {
+            background-color: #4CAF50;
+            border-radius: 10px;
+        }
+        .upload-message {
+            margin-top: 10px;
+            color: #666;
+        }
+        .documents-list {
+            margin-top: 20px;
+        }
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            position: relative;
+        }
+        .document-item .delete-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .document-item .delete-btn:hover {
+            background-color: #cc0000;
+        }
+        .view-btn {
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .view-btn:hover {
+            background-color: #45a049;
+        }
+        #file-list {
+            margin-top: 20px;
+        }
+        .ticket-list {
+            margin-top: 20px;
+        }
+        .ticket {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="login-section">
+            <h1>Portal de Empleados</h1>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div class="error" id="login-error">Credenciales incorrectas. Inténtelo de nuevo.</div>
+                <div class="form-group">
+                    <button id="login-btn">Iniciar Sesión</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="dashboard" class="dashboard">
+            <h1>Bienvenido al Dashboard</h1>
+            <p>Has iniciado sesión correctamente.</p>
+            
+            <div class="ticket-list">
+                <div class="ticket">
+                    <h3>Ticket #1</h3>
+                    <p>Solicitud de vacaciones</p>
+                    <small>Estado: Pendiente</small>
+                </div>
+                <div class="ticket">
+                    <h3>Ticket #2</h3>
+                    <p>Reporte de gastos</p>
+                    <small>Estado: Aprobado</small>
+                </div>
+            </div>
+
+            <h2>Subir Documentos</h2>
+            <div class="upload-section" id="drop-zone">
+                <h3>Arrastre sus archivos aquí o use el botón para seleccionar</h3>
+                <p>Formatos permitidos: PDF, PNG</p>
+                <input type="file" id="file-upload" name="file" accept=".pdf,.png" multiple>
+                <button type="button" class="upload-button" onclick="document.getElementById('file-upload').click()">
+                    Seleccionar Archivos
+                </button>
+                <div class="progress-container" id="upload-progress">
+                    <progress value="0" max="100"></progress>
+                    <div class="upload-message">Subiendo: <span class="progress-text">0%</span></div>
+                </div>
+            </div>
+
+            <div id="file-list">
+                <h3>Documentos Subidos</h3>
+                <div class="documents-list">
+                    <!-- Los documentos subidos aparecerán aquí -->
+                </div>
+            </div>
+            
+            <button id="logout-btn" style="margin-top: 20px; width: auto;">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-btn').addEventListener('click', function() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Credenciales válidas para prueba
+            if(username === 'admin' && password === 'admin123') {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.title = 'Dashboard - Portal de Empleados';
+                loadFileList(); // Cargar la lista de archivos al iniciar sesión
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+        
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+            document.title = 'Portal de Empleados';
+        });
+
+        // Función para formatear el tamaño del archivo
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Función para cargar la lista de archivos
+        async function loadFileList() {
+            try {
+                const response = await fetch('/files');
+                const data = await response.json();
+                
+                if (data.status) {
+                    const fileList = document.querySelector('.documents-list');
+                    fileList.innerHTML = '';
+                    
+                    if (data.files.length === 0) {
+                        fileList.innerHTML = '<p>No hay archivos subidos</p>';
+                        return;
+                    }
+                    
+                    // Agrupar archivos por nombre base
+                    const uniqueFiles = new Map();
+                    data.files.forEach(file => {
+                        const baseFileName = file.name.split('-').slice(1).join('-');
+                        if (!uniqueFiles.has(baseFileName) || 
+                            new Date(file.uploadDate) > new Date(uniqueFiles.get(baseFileName).uploadDate)) {
+                            uniqueFiles.set(baseFileName, file);
+                        }
+                    });
+                    
+                    // Mostrar solo los archivos únicos más recientes
+                    Array.from(uniqueFiles.values()).forEach(file => {
+                        const baseFileName = file.name.split('-').slice(1).join('-');
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'document-item';
+                        fileItem.setAttribute('data-filename', file.name);
+                        
+                        const fileType = baseFileName.toLowerCase().endsWith('.pdf') ? 'PDF' : 'PNG';
+                        const fileIcon = fileType === 'PDF' ? '📄' : '🖼️';
+                        const uploadDate = new Date(file.uploadDate).toLocaleString();
+                        
+                        fileItem.innerHTML = `
+                            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span>${fileIcon}</span>
+                                    <div class="document-info">
+                                        <strong>${baseFileName}</strong>
+                                        <br>
+                                        <small>Tipo: ${fileType} - Tamaño: ${formatFileSize(file.size)}</small>
+                                        <br>
+                                        <small>Subido: ${uploadDate}</small>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <a href="/uploads/${file.name}" target="_blank" class="view-btn">Ver</a>
+                                    <button class="delete-btn" onclick="deleteFile('${file.name}')" title="Eliminar archivo">×</button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        fileList.appendChild(fileItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar la lista de archivos:', error);
+                alert('Error al cargar la lista de archivos');
+            }
+        }
+
+        // Función para eliminar archivos
+        async function deleteFile(fileName) {
+            if (!fileName) return;
+            
+            if (confirm('¿Está seguro que desea eliminar este archivo?')) {
+                try {
+                    const response = await fetch('/delete-file', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ fileName })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.status) {
+                        // Eliminar el elemento del DOM inmediatamente
+                        const baseFileName = fileName.split('-').slice(1).join('-');
+                        const elements = document.querySelectorAll('.document-item');
+                        elements.forEach(el => {
+                            const name = el.querySelector('.document-info strong').textContent;
+                            if (name.includes(baseFileName)) {
+                                el.remove();
+                            }
+                        });
+                    } else {
+                        alert('Error al eliminar el archivo: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar el archivo:', error);
+                    alert('Error al eliminar el archivo: ' + error.message);
+                }
+            }
+        }
+
+        // Manejar la subida de archivos
+        document.getElementById('file-upload').addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (!files.length) return;
+
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = progressContainer.querySelector('progress');
+            const progressText = progressContainer.querySelector('.progress-text');
+            
+            for (let file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    progressContainer.classList.add('active');
+                    progressBar.value = 0;
+                    progressText.textContent = '0%';
+                    
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status) {
+                        progressBar.value = 100;
+                        progressText.textContent = '100%';
+                        await loadFileList();
+                    } else {
+                        alert('Error al subir el archivo: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error al subir el archivo:', error);
+                    alert('Error al subir el archivo');
+                } finally {
+                    setTimeout(() => {
+                        progressContainer.classList.remove('active');
+                    }, 1000);
+                }
+            }
+            // Limpiar el input para permitir subir el mismo archivo nuevamente
+            this.value = '';
+        });
+
+        // Configurar la zona de arrastrar y soltar
+        const dropZone = document.getElementById('drop-zone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#4CAF50';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ccc';
+        });
+
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ccc';
+            
+            const files = e.dataTransfer.files;
+            const fileUpload = document.getElementById('file-upload');
+            
+            // Create a new FileList-like object
+            const dataTransfer = new DataTransfer();
+            Array.from(files).forEach(file => dataTransfer.items.add(file));
+            fileUpload.files = dataTransfer.files;
+            
+            // Disparar el evento change para procesar los archivos
+            const event = new Event('change');
+            fileUpload.dispatchEvent(event);
+        });
+
+        // Agregar el evento click al botón de selección
+        document.getElementById('select-files-btn').addEventListener('click', function() {
+            document.getElementById('file-upload').click();
+        });
+
+        // Cargar la lista inicial de archivos cuando se muestra el dashboard
+        if (document.getElementById('dashboard').style.display === 'block') {
+            loadFileList();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "project-n8n",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.14.1"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-fileupload": "^1.5.1",
+    "multer": "^1.4.5-lts.2"
+  }
+}
